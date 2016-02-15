@@ -10,7 +10,7 @@ public class HelloResource {
     @GET
     @Produces("text/plain")
     public String sayHi() {
-        return "hi there";
+        return "HI THERE";
     }
 
 }

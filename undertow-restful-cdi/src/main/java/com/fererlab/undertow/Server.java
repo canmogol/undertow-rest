@@ -1,6 +1,9 @@
 package com.fererlab.undertow;
 
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
+import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.test.TestPortProvider;
 
 import javax.ws.rs.client.Client;
@@ -22,11 +25,23 @@ public class Server {
     private void run() {
 
         long time = System.currentTimeMillis();
-        UndertowJaxrsServer server = new UndertowJaxrsServer().start();
+        UndertowJaxrsServer server = new UndertowJaxrsServer();
+        server.start();
         logger.info("server created: " + (System.currentTimeMillis() - time) + " milli seconds");
-
         time = System.currentTimeMillis();
-        server.deploy(SingleApplication.class, "/api");
+
+        ResteasyDeployment deployment = new ResteasyDeployment();
+        deployment.setInjectorFactoryClass("org.jboss.resteasy.cdi.CdiInjectorFactory");
+        deployment.setApplicationClass(SingleApplication.class.getName());
+
+        DeploymentInfo deploymentInfo = server.undertowDeployment(deployment, "/api");
+        deploymentInfo.setDisplayName("cdi");
+        deploymentInfo.setClassLoader(Server.class.getClassLoader());
+        deploymentInfo.setContextPath("/cdi");
+        deploymentInfo.setDeploymentName("cdi example");
+        deploymentInfo.addListeners(Servlets.listener(org.jboss.weld.environment.servlet.Listener.class));
+
+        server.deploy(deploymentInfo);
         logger.info("server deployed: " + (System.currentTimeMillis() - time) + " milli seconds");
 
         time = System.currentTimeMillis();
@@ -34,7 +49,7 @@ public class Server {
         logger.info("client created: " + (System.currentTimeMillis() - time) + " milli seconds");
 
         time = System.currentTimeMillis();
-        String response = client.target(TestPortProvider.generateURL("/api/hi")).request().get(String.class);
+        String response = client.target(TestPortProvider.generateURL("/cdi/api/inject/hi/JOHN")).request().get(String.class);
         logger.info("request completed: " + (System.currentTimeMillis() - time));
         logger.info("RESPONSE: " + response);
 
@@ -47,5 +62,6 @@ public class Server {
         logger.info("server stopped: " + (System.currentTimeMillis() - time) + " milli seconds");
 
     }
+
 
 }
