@@ -10,4 +10,5 @@
 		<module>undertow-restful</module>
 		<module>undertow-restful-cdi</module>
 	</modules>
+	<!-- module dependencies and properties may be moved here -->
 </project>
