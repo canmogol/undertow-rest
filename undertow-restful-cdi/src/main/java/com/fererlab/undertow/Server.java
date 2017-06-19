@@ -4,10 +4,7 @@ import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
-import org.jboss.resteasy.test.TestPortProvider;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import java.io.IOException;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -22,11 +19,11 @@ public class Server {
         server.run();
     }
 
-    private void run() {
+    private void run() throws IOException {
 
         long time = System.currentTimeMillis();
         UndertowJaxrsServer server = new UndertowJaxrsServer();
-        server.start();
+
         logger.info("server created: " + (System.currentTimeMillis() - time) + " milli seconds");
         time = System.currentTimeMillis();
 
@@ -44,22 +41,24 @@ public class Server {
         server.deploy(deploymentInfo);
         logger.info("server deployed: " + (System.currentTimeMillis() - time) + " milli seconds");
 
-        time = System.currentTimeMillis();
-        Client client = ClientBuilder.newClient();
-        logger.info("client created: " + (System.currentTimeMillis() - time) + " milli seconds");
+        server.start();
 
-        time = System.currentTimeMillis();
-        String response = client.target(TestPortProvider.generateURL("/cdi/api/inject/hi/JOHN")).request().get(String.class);
-        logger.info("request completed: " + (System.currentTimeMillis() - time));
-        logger.info("RESPONSE: " + response);
-
-        time = System.currentTimeMillis();
-        client.close();
-        logger.info("client closed: " + (System.currentTimeMillis() - time) + " milli seconds");
-
-        time = System.currentTimeMillis();
-        server.stop();
-        logger.info("server stopped: " + (System.currentTimeMillis() - time) + " milli seconds");
+//        time = System.currentTimeMillis();
+//        Client client = ClientBuilder.newClient();
+//        logger.info("client created: " + (System.currentTimeMillis() - time) + " milli seconds");
+//
+//        time = System.currentTimeMillis();
+//        String response = client.target(TestPortProvider.generateURL("/cdi/api/inject/hi/JOHN")).request().get(String.class);
+//        logger.info("request completed: " + (System.currentTimeMillis() - time));
+//        logger.info("RESPONSE: " + response);
+//
+//        time = System.currentTimeMillis();
+//        client.close();
+//        logger.info("client closed: " + (System.currentTimeMillis() - time) + " milli seconds");
+//
+//        time = System.currentTimeMillis();
+//        server.stop();
+//        logger.info("server stopped: " + (System.currentTimeMillis() - time) + " milli seconds");
 
     }
 
